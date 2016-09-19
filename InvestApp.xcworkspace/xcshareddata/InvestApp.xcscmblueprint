@@ -1,0 +1,35 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "84750A7B566EA08BACBF35471E040959EFBFF874",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "84750A7B566EA08BACBF35471E040959EFBFF874" : {
+
+    },
+    "c62998f5-f394-4a81-b875-b39c7fe17ad2++6927" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "84750A7B566EA08BACBF35471E040959EFBFF874" : 9223372036854775807,
+    "c62998f5-f394-4a81-b875-b39c7fe17ad2++6927" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "2CF7B554-C1F7-452B-8F17-F5EC9A9AB412",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "84750A7B566EA08BACBF35471E040959EFBFF874" : "OneCarEnterprise\/",
+    "c62998f5-f394-4a81-b875-b39c7fe17ad2++6927" : "ONE%20CAR\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "InvestApp",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "InvestApp.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "svn:\/\/120.26.212.208",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "84750A7B566EA08BACBF35471E040959EFBFF874"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "svn:\/\/120.26.212.208",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "c62998f5-f394-4a81-b875-b39c7fe17ad2++6927"
+    }
+  ]
+}

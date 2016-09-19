@@ -1,0 +1,109 @@
+//
+//  InvestAppPrefixHeader.pch
+//  InvestApp
+//
+//  Created by 张久成 on 16/3/14.
+//  Copyright © 2016年 Zhangjc. All rights reserved.
+//
+
+
+#import "AppStyleConfiguration.h"
+#import "AppLanguage.h"
+#import "MJRefresh.h"
+#import "MJExtension.h"
+#import "Masonry.h"
+#import "ReactiveCocoa.h"
+#import "SDWebImageManager.h"
+#import "SVProgressHUD.h"
+#import "IQKeyboardManager.h"
+#import "NSString+IDFA.h"
+#import "NSString+rate.h"
+#import "GTCommontHeader.h"
+#import "UIButoon+Style.h"
+#import "ZFTool.h"
+#define TEL @"400000000"
+
+#define REQ_BASE_URL @"http://114.55.108.204:8081"
+#define kAppVersion [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
+#define NavigationLeftReghtFont 13
+#define NavigationTitleFont 14
+#define ButtonTitleFont 14
+#define LabelTitleFont 14
+#define TextFileTitleFont 14
+#define TextViewTitleFont 14
+
+/**
+ RGB颜色
+ */
+#define RGBA(r,g,b,a) [UIColor colorWithRed:(float)r/255.0f green:(float)g/255.0f blue:(float)b/255.0f alpha:a]
+#define kAppVersion [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
+#define kMainTopHeight 64
+#define kMainBottomHeight 50
+#define kMainScreen_width [[UIScreen mainScreen] bounds].size.width
+#define kMainScreen_height [[UIScreen mainScreen] bounds].size.height
+
+#ifdef DEBUG
+#define NSLog(FORMAT, ...) fprintf(stderr,"%s:%d\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
+#else
+#define NSLog(FORMAT, ...) nil
+#endif
+#if __has_feature(objc_instancetype)
+
+#undef	AS_SINGLETON
+#define AS_SINGLETON
+
+#undef	AS_SINGLETON
+#define AS_SINGLETON( ... ) \
+- (instancetype)sharedInstance; \
++ (instancetype)sharedInstance;
+
+#undef	DEF_SINGLETON
+#define DEF_SINGLETON \
+- (instancetype)sharedInstance \
+{ \
+return [[self class] sharedInstance]; \
+} \
++ (instancetype)sharedInstance \
+{ \
+static dispatch_once_t once; \
+static id __singleton__; \
+dispatch_once( &once, ^{ __singleton__ = [[self alloc] init]; } ); \
+return __singleton__; \
+}
+
+#undef	DEF_SINGLETON
+#define DEF_SINGLETON( ... ) \
+- (instancetype)sharedInstance \
+{ \
+return [[self class] sharedInstance]; \
+} \
++ (instancetype)sharedInstance \
+{ \
+static dispatch_once_t once; \
+static id __singleton__; \
+dispatch_once( &once, ^{ __singleton__ = [[self alloc] init]; } ); \
+return __singleton__; \
+}
+
+#else	// #if __has_feature(objc_instancetype)
+
+#undef	AS_SINGLETON
+#define AS_SINGLETON( __class ) \
+- (__class *)sharedInstance; \
++ (__class *)sharedInstance;
+
+#undef	DEF_SINGLETON
+#define DEF_SINGLETON( __class ) \
+- (__class *)sharedInstance \
+{ \
+return [__class sharedInstance]; \
+} \
++ (__class *)sharedInstance \
+{ \
+static dispatch_once_t once; \
+static __class * __singleton__; \
+dispatch_once( &once, ^{ __singleton__ = [[[self class] alloc] init]; } ); \
+return __singleton__; \
+}
+
+#endif	// #if __has_feature(objc_instancetype)

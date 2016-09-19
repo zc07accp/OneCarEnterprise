@@ -1,0 +1,142 @@
+//
+//  BaseUtils.m
+//  InvestApp
+//
+//  Created by 张久成 on 16/3/14.
+//  Copyright © 2016年 Zhangjc. All rights reserved.
+//
+
+#import "BaseUtils.h"
+#import "UserUtils.h"
+//#define REQ_BASE_URL @"http://115.199.240.5:8888"
+#define REQ_BASE_URL @"http://192.168.1.14:8080"
+//#define REQ_BASE_URL @"http://192.168.1.6:58080"
+@interface BaseUtils ()
+
+@end
+@implementation BaseUtils
+
+
+- (id)init{
+    self = [super init];
+    if (self) {
+        [self loadData];
+    }
+    return self;
+} 
+
+
+/**
+ *  加载数据
+ */
+- (void)loadData{
+    
+}
+
+
+- (BOOL)isPureInt:(NSString*)string{
+    NSScanner* scan = [NSScanner scannerWithString:string];
+    int val;
+    return [scan scanInt:&val] && [scan isAtEnd];
+}
+
+
+/**
+ *  请求数据
+ *
+ *  @param dic     dic description
+ *  @param method  method description
+ *  @param succeed succeed description
+ *  @param failure failure description
+ */
+- (void)requestData:(NSDictionary*)dic method:(NSString*)method succeed:(void (^)(id response))succeed failure:(void (^)(NSError* error))failure{
+    //请求数据e
+    
+    //[SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeGradient];
+    //[SVProgressHUD setOffsetFromCenter:UIOffsetMake(0, -kMainScreen_height/2+kMainTopHeight+90)];
+    [SVProgressHUD setBackgroundColor:[UIColor colorWithWhite:0 alpha:0.5]];
+    [SVProgressHUD setForegroundColor:[UIColor whiteColor]];
+    [SVProgressHUD setErrorImage:[UIImage imageNamed:@"icon_touxiang_fenqi"]];
+    NSString *path = [NSString stringWithFormat:@"%@%@",REQ_BASE_URL,method];
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    if (self.isResponseHtmlType) {
+        manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    }else{
+        manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    }
+    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+    manager.requestSerializer.timeoutInterval = 10;
+
+    [manager POST:path parameters:dic progress:^(NSProgress * _Nonnull uploadProgress) {
+        
+        NSLog(@"%@",uploadProgress);
+        
+    } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        
+        succeed ( responseObject );
+        NSLog(@" \nmethod:\n%@ \n\n parameters:\n %@  \n\nresponse: \n%@\n",method,dic,responseObject);
+        
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        failure ( error );
+        NSLog(@"%@",error);
+        
+    }];
+    
+    
+}
+-(void)requestImageDataDic:(NSDictionary *)dic WithImagedata:(NSData *)imageData method:(NSString *)method succeed:(void (^)(id))succeed failure:(void (^)(NSError *))failure progress:(void (^)(NSProgress *))progress
+{
+    
+    NSString *path = [NSString stringWithFormat:@"%@%@",REQ_BASE_URL,method];
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    if (self.isResponseHtmlType) {
+        manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    }else{
+        manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    }
+    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+    manager.requestSerializer.timeoutInterval = 100;
+    
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [manager.requestSerializer setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+    [manager.requestSerializer setValue:@"multipart/form-data; boundary=YY" forHTTPHeaderField:@"Content-Type"];
+    manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript",@"text/plain", nil];
+    [manager POST:path parameters:dic constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        //[formData appendPartWithFormData:imageData name:@"zipFile"];
+        [formData appendPartWithFileData:imageData name:@"zipFile"fileName:@"newZipFile.zip"mimeType:@""];
+        //[formData appendPartWithFileURL:[NSURL fileURLWithPath:imageData] name:@"file" error:nil];
+        
+    } progress:^(NSProgress * uploadProgress) {
+        progress(uploadProgress);
+        NSLog(@"大师级别的发挥建设客户发布的就是看:%lld",uploadProgress.totalUnitCount);
+    } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        
+        succeed(responseObject);
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        
+    }];
+    
+}
+
+
+/**
+ *  获取基础的参数字典
+ *
+ *  @return return value description
+ */
+- (NSMutableDictionary*)getBaseParameter{
+
+    NSMutableDictionary *parameter = [NSMutableDictionary dictionary];
+    [parameter setValue:@"" forKey:@"sign"];
+    [parameter setValue:@"IOS" forKey:@"appType"];
+    [parameter setValue:kAppVersion forKey:@"version"];
+    [parameter setValue:[NSString idfaString] forKey:@"token"];
+    if ([UserUtils online]) {
+        [parameter setValue:[UserUtils userId] forKey:@"userId"];
+    }
+    
+    return parameter;
+}
+
+@end

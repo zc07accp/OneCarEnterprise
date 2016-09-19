@@ -1,0 +1,269 @@
+//
+//  UserBoard.m
+//  InvestApp
+//
+//  Created by 张久成 on 16/3/15.
+//  Copyright © 2016年 Zhangjc. All rights reserved.
+//
+
+#import "UserBoard.h"
+#import "RootBoard.h"
+#import "UserModel.h"
+
+#import "UserView.h"
+#import "UserAmountBoard.h"
+#import "UserCenterBoard.h"
+#import "UserAssetBoard.h"
+#import "UserIncomeBoard.h"
+#import "UserMessageBoard.h"
+
+@interface UserBoard ()
+@property(nonatomic,strong)UIView *view_dot;
+
+@end
+@implementation UserBoard
+-(UIView *)view_dot
+{
+    if (!_view_dot) {
+        _view_dot=[[UIView alloc]init];
+    }
+    return _view_dot;
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    self.navigationController.navigationBar.titleTextAttributes = @{UITextAttributeTextColor: [UIColor blackColor],
+                                                                    UITextAttributeFont : [UIFont fontWithName:@"Helvetica" size:15]};
+    
+
+    UserView *view = [[UserView alloc] init];
+    view.backgroundColor = [AppStyleConfiguration beijingse];
+    view.frame = self.view.bounds;
+    view.view_money.table_list.delegate = self;
+    view.view_money.table_list.dataSource =self;
+    self.view = view;
+    
+    
+    /**
+     *  nav
+     */
+    UIButton  *letfBtn = [UIButton buttonWithTitle:nil
+                                    withTitleColor:nil
+                                          withSize:15
+                                     withImageName:@"icon_zhanghu_wode"
+                                       withBGColor:nil];
+    letfBtn.frame = CGRectMake(0, 0, 60, 44);
+    letfBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
+    UIBarButtonItem *litem = [[UIBarButtonItem alloc] initWithCustomView:letfBtn];
+    
+
+    [self.navigationItem setLeftBarButtonItem:litem];
+    
+    
+    UIButton  *rBtn = [UIButton buttonWithTitle:nil
+                                    withTitleColor:nil
+                                          withSize:15
+                                     withImageName:@"icon_xiaoxi_wode"
+                                       withBGColor:nil];
+    self.view_dot.layer.cornerRadius = 5;
+    //self.view_dot.backgroundColor = [UIColor colorWithRed:0.06 green:0.33 blue:0.96 alpha:1.00];
+    self.view_dot.backgroundColor = [AppStyleConfiguration anniuhong];
+    
+    [rBtn addSubview:self.view_dot];
+    self.view_dot.hidden=YES;
+    [self.view_dot mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo (@(8));
+        make.right.equalTo (@(-5));
+        make.width.equalTo(@10);
+        make.height.equalTo(@10);
+    }];
+
+    rBtn.frame = CGRectMake(0, 0, 60, 44);
+    rBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 20, 0, 0);
+    UIBarButtonItem *ritem = [[UIBarButtonItem alloc] initWithCustomView:rBtn];
+    [self.navigationItem setRightBarButtonItem:ritem];
+    
+    
+    
+    /**
+     *  点击了用户中心
+     *
+     *  @param gestureRecoginzer gestureRecoginzer description
+     *
+     *  @return return value description
+     */
+    [letfBtn addTapActionWithBlock:^(UIGestureRecognizer *gestureRecoginzer) {
+        [self.navigationController pushViewController:[UserCenterBoard board] animated:YES];
+    }];
+    
+    
+    /**
+     *  点击了用户信息
+     *
+     *  @param gestureRecoginzer <#gestureRecoginzer description#>
+     *
+     *  @return <#return value description#>
+     */
+    [rBtn addTapActionWithBlock:^(UIGestureRecognizer *gestureRecoginzer) {
+        [self.navigationController pushViewController:[UserMessageBoard board] animated:YES];
+    }];
+    
+    /**
+     *  更新我的首页数据
+     *
+     *  @param sharedInstance] sharedInstance] description
+     *  @param indexData       indexData description
+     *
+     *  @return <#return value description#>
+     */
+    [RACObserve([UserUtils sharedInstance], indexData) subscribeNext:^(id x) {
+        
+        //UserIndex *data = [UserUtils sharedInstance].indexData;
+        [view buildView:UserViewType_NOBAR];
+        view.view_money.label_money.text = [UserUtils sharedInstance].indexData.datePofit;
+        view.view_money.label_income.text = [NSString stringWithFormat:@"%@收益（元）",[UserUtils sharedInstance].indexData.profitDate];
+        [view.view_money.table_list reloadData];
+    }];
+    
+    
+    
+    
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    /**
+     *  更新首页数据
+     *
+     *  @param data <#data description#>
+     *
+     *  @return <#return value description#>
+     */
+    /** 未读*/
+    [[UserUtils sharedInstance] UnreadMessage:^(id data) {
+        if ([[UserUtils sharedInstance].userUnreadMsgModel.count intValue] > 0) {
+            self.view_dot.hidden=NO;
+        }else{
+            self.view_dot.hidden=YES;
+        }
+    } failure:^(NSError *error) {
+        
+    }];
+
+    
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [[UserUtils sharedInstance] updateUserIndex:^(id data) {
+        
+    } failure:^(NSError *error) {
+    }];
+
+    
+    RootBoard *board = (RootBoard*)self.rootBoard;
+    [[board tabBarBoard] setTabBarHidden:NO animated:NO];
+}
+
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    RootBoard *board = (RootBoard*)self.rootBoard;
+    [[board tabBarBoard] setTabBarHidden:YES animated:NO];
+}
+
+
+
+
+#pragma mark - 
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return kUMCellHeight;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return 4;
+}
+
+
+- (UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    UMCell *cell = [tableView dequeueReusableCellWithIdentifier:@"umcell"];
+    if (!cell) {
+        cell = [[UMCell alloc] initWithStyle:UITableViewCellStyleDefault
+                             reuseIdentifier:@"umcell"];
+    }
+    
+    UserIndex *data = [UserUtils sharedInstance].indexData;
+    cell.userInteractionEnabled = YES;
+    cell.img_arrow.hidden = NO;
+    switch (indexPath.row) {
+        case 0:
+        {
+            cell.label_title.text = @"累计收益（元）";
+            cell.label_desc.text = [NSString stringWithFormat:@"%.2f",[data.totalProfit doubleValue]];
+        }
+            break;
+        case 1:
+        {
+            cell.img_arrow.hidden = YES;
+            cell.label_title.text = @"总资产（元）";
+            cell.label_desc.text = [NSString stringWithFormat:@"%.2f",[data.totalAmount doubleValue]];
+            cell.userInteractionEnabled = NO;
+        }
+            break;
+        case 2:
+        {
+            cell.label_title.text = @"持有资产（元）";
+            cell.label_desc.text = [NSString stringWithFormat:@"%.2f",[data.holdAmount doubleValue]];
+            
+        }
+            break;
+        case 3:
+        {
+            cell.label_title.text = @"账户余额（元）";
+            cell.label_desc.text = [NSString stringWithFormat:@"%.2f",[data.accAmount doubleValue]];
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+    
+    
+    return cell;
+}
+
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    switch (indexPath.row) {
+        case 0: //收益
+        {
+            UserIncomeBoard *board = [UserIncomeBoard board];
+            [self.navigationController pushViewController:board animated:YES];
+        }
+            break;
+        case 2://资产
+        {
+            UserAssetBoard *board = [UserAssetBoard board];
+            [self.navigationController pushViewController:board animated:YES];
+            
+        }
+            break;
+        case 3://余额
+        {
+            
+            UserAmountBoard *board = [UserAmountBoard board];
+            [self.navigationController pushViewController:board animated:YES];
+
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+@end
